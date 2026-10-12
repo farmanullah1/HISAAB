@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
         CategoryEntity::class,
         NeedEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -89,12 +89,6 @@ abstract class AppDatabase : RoomDatabase() {
                         type = AccountType.BANK,
                         openingBalancePaisa = 0L,
                         colorHex = "#6BA88A"
-                    ),
-                    AccountEntity(
-                        name = "Wallet",
-                        type = AccountType.WALLET,
-                        openingBalancePaisa = 0L,
-                        colorHex = "#D6A15C"
                     )
                 )
                 accountDao.insertAccounts(starterAccounts)

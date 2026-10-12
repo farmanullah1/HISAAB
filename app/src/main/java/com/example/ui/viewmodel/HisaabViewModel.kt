@@ -28,8 +28,6 @@ data class HomeUiState(
     val totalBalancePaisa: Long = 0L,
     val cashBalancePaisa: Long = 0L,
     val bankBalancePaisa: Long = 0L,
-    val walletBalancePaisa: Long = 0L,
-    val hasWalletActivity: Boolean = false,
     val thisMonthIncomePaisa: Long = 0L,
     val thisMonthExpensePaisa: Long = 0L,
     val transactions: List<TransactionEntity> = emptyList(),
@@ -80,13 +78,9 @@ class HisaabViewModel(application: Application) : AndroidViewModel(application) 
 
         val cashAcc = accounts.find { it.type == AccountType.CASH }
         val bankAcc = accounts.find { it.type == AccountType.BANK }
-        val walletAcc = accounts.find { it.type == AccountType.WALLET }
 
         val cashBal = cashAcc?.let { balancesMap[it.id] } ?: 0L
         val bankBal = bankAcc?.let { balancesMap[it.id] } ?: 0L
-        val walletBal = walletAcc?.let { balancesMap[it.id] } ?: 0L
-
-        val hasWallet = walletAcc != null && (walletBal != 0L || txns.any { it.fromAccountId == walletAcc.id || it.toAccountId == walletAcc.id })
 
         // This Month totals
         val currentMonthTxns = txns.filter { txn ->
@@ -101,8 +95,6 @@ class HisaabViewModel(application: Application) : AndroidViewModel(application) 
             totalBalancePaisa = totalBalance,
             cashBalancePaisa = cashBal,
             bankBalancePaisa = bankBal,
-            walletBalancePaisa = walletBal,
-            hasWalletActivity = hasWallet,
             thisMonthIncomePaisa = monthIncome,
             thisMonthExpensePaisa = monthExpense,
             transactions = txns,
@@ -158,10 +150,11 @@ class HisaabViewModel(application: Application) : AndroidViewModel(application) 
         categoryId: Long,
         note: String,
         date: Long,
+        receiptUri: String? = null,
         onSuccess: (String) -> Unit
     ) {
         viewModelScope.launch {
-            repository.addExpense(amountPaisa, fromAccountId, categoryId, note, date)
+            repository.addExpense(amountPaisa, fromAccountId, categoryId, note, date, receiptUri)
             val accName = homeState.value.accounts.find { it.id == fromAccountId }?.name ?: "Account"
             onSuccess("Expense recorded from $accName")
         }

@@ -18,9 +18,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PhotoCamera
+import coil.compose.AsyncImage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -75,7 +82,7 @@ fun AddTransactionScreen(
     accounts: List<AccountEntity>,
     categories: List<CategoryEntity>,
     onDismiss: () -> Unit,
-    onSaveExpense: (amountPaisa: Long, fromAccountId: Long, categoryId: Long, note: String, date: Long) -> Unit,
+    onSaveExpense: (amountPaisa: Long, fromAccountId: Long, categoryId: Long, note: String, date: Long, receiptUri: String?) -> Unit,
     onSaveIncome: (amountPaisa: Long, toAccountId: Long, categoryId: Long, note: String, date: Long) -> Unit,
     onSaveTransfer: (amountPaisa: Long, fromId: Long, toId: Long, note: String, date: Long) -> Unit
 ) {
@@ -89,6 +96,15 @@ fun AddTransactionScreen(
     var noteInput by remember { mutableStateOf("") }
     var selectedDateMs by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var attachedReceiptUri by remember { mutableStateOf<String?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            attachedReceiptUri = uri.toString()
+        }
+    }
 
     val filteredCategories = remember(categories, selectedType) {
         categories.filter { it.type == selectedType }
@@ -471,6 +487,109 @@ fun AddTransactionScreen(
                 }
             }
 
+            // Optional Receipt Photo Attachment (for Expense)
+            if (selectedType == TransactionType.EXPENSE) {
+                Spacer(modifier = Modifier.height(12.dp))
+                if (attachedReceiptUri != null) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, ExpenseCoral.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                AsyncImage(
+                                    model = attachedReceiptUri,
+                                    contentDescription = "Receipt photo",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Receipt Photo Attached",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = TextDeepCharcoal
+                                    )
+                                    Text(
+                                        text = "Tap delete to remove",
+                                        fontSize = 11.sp,
+                                        color = TextMediumGray
+                                    )
+                                }
+                            }
+                            IconButton(
+                                onClick = { attachedReceiptUri = null },
+                                modifier = Modifier.testTag("remove_receipt_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Remove receipt",
+                                    tint = ExpenseCoral,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                            .padding(14.dp)
+                            .testTag("attach_receipt_button"),
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.AddPhotoAlternate,
+                                    contentDescription = "Attach Receipt",
+                                    tint = CoralPrimary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "Attach Picture / Receipt (Optional)",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = TextDeepCharcoal
+                                    )
+                                    Text(
+                                        text = "Add photo proof of this purchase",
+                                        fontSize = 11.sp,
+                                        color = TextMediumGray
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(14.dp))
         }
 
@@ -492,7 +611,7 @@ fun AddTransactionScreen(
                 onClick = {
                     when (selectedType) {
                         TransactionType.EXPENSE -> {
-                            onSaveExpense(parsedPaisa, selectedFromAccountId, selectedCategoryId, noteInput, selectedDateMs)
+                            onSaveExpense(parsedPaisa, selectedFromAccountId, selectedCategoryId, noteInput, selectedDateMs, attachedReceiptUri)
                         }
                         TransactionType.INCOME -> {
                             onSaveIncome(parsedPaisa, selectedToAccountId, selectedCategoryId, noteInput, selectedDateMs)

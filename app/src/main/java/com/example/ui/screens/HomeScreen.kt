@@ -21,15 +21,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapHoriz
+import coil.compose.AsyncImage
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -196,7 +197,7 @@ fun HomeScreen(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = Icons.Default.AttachMoney,
+                                        imageVector = Icons.Default.Payments,
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size(16.dp)
@@ -243,36 +244,6 @@ fun HomeScreen(
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
-                            }
-
-                            if (state.hasWalletActivity) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.AccountBalanceWallet,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = "Wallet",
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            color = Color.White
-                                        )
-                                    }
-                                    Text(
-                                        text = Money.formatPkr(state.walletBalancePaisa),
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                }
                             }
                         }
                     }
@@ -600,6 +571,36 @@ fun HomeScreen(
                                         Text(text = it, fontSize = 12.sp, color = TextMediumGray)
                                     }
                                 }
+
+                                if (!txn.receiptUri.isNullOrBlank()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.AttachFile,
+                                            contentDescription = "Receipt attached",
+                                            tint = ExpenseCoral,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(3.dp))
+                                        Text(
+                                            text = "Receipt attached",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = ExpenseCoral
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (!txn.receiptUri.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                AsyncImage(
+                                    model = txn.receiptUri,
+                                    contentDescription = "Receipt thumbnail",
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                )
                             }
 
                             Spacer(modifier = Modifier.width(8.dp))

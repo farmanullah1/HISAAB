@@ -59,7 +59,8 @@ class HisaabRepository(private val db: AppDatabase) {
         fromAccountId: Long,
         categoryId: Long,
         note: String,
-        date: Long
+        date: Long,
+        receiptUri: String? = null
     ): Long {
         require(amountPaisa > 0) { "Expense amount must be greater than zero." }
         val txn = TransactionEntity(
@@ -69,6 +70,7 @@ class HisaabRepository(private val db: AppDatabase) {
             toAccountId = null,
             categoryId = categoryId,
             note = note.trim(),
+            receiptUri = receiptUri,
             dateEpochMs = date
         )
         return transactionDao.insertTransaction(txn)

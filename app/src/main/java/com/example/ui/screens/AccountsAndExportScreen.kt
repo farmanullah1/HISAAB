@@ -23,8 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
@@ -126,7 +125,7 @@ fun AccountsAndExportScreen(
                             color = TextDeepCharcoal
                         )
                         Text(
-                            text = "Move money between Cash, Bank, and Wallet atomically",
+                            text = "Move money between Cash and Bank accounts atomically",
                             fontSize = 12.sp,
                             color = TextMediumGray
                         )
@@ -187,7 +186,6 @@ fun AccountsAndExportScreen(
                                     when (account.type) {
                                         AccountType.CASH -> IncomeGreen.copy(alpha = 0.15f)
                                         AccountType.BANK -> TransferBlue.copy(alpha = 0.15f)
-                                        AccountType.WALLET -> CoralPrimary.copy(alpha = 0.15f)
                                     },
                                     CircleShape
                                 ),
@@ -195,15 +193,13 @@ fun AccountsAndExportScreen(
                         ) {
                             Icon(
                                 imageVector = when (account.type) {
-                                    AccountType.CASH -> Icons.Default.AttachMoney
+                                    AccountType.CASH -> Icons.Default.Payments
                                     AccountType.BANK -> Icons.Default.AccountBalance
-                                    AccountType.WALLET -> Icons.Default.AccountBalanceWallet
                                 },
                                 contentDescription = null,
                                 tint = when (account.type) {
                                     AccountType.CASH -> IncomeGreen
                                     AccountType.BANK -> TransferBlue
-                                    AccountType.WALLET -> CoralPrimary
                                 },
                                 modifier = Modifier.size(20.dp)
                             )

@@ -90,6 +90,5 @@ enum class TransactionType {
 
 enum class AccountType(val displayName: String) {
     CASH("Cash"),
-    BANK("Bank"),
-    WALLET("Wallet")
+    BANK("Bank")
 }

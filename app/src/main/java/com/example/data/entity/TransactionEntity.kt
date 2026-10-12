@@ -22,6 +22,7 @@ data class TransactionEntity(
     val toAccountId: Long? = null,
     val categoryId: Long? = null,
     val note: String = "",
+    val receiptUri: String? = null,
     val dateEpochMs: Long,
     val createdAtEpochMs: Long = System.currentTimeMillis()
 )

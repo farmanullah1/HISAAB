@@ -223,8 +223,8 @@ fun HisaabApp(viewModel: HisaabViewModel) {
             accounts = homeState.accounts,
             categories = homeState.categories,
             onDismiss = { showAddTransactionSheet = false },
-            onSaveExpense = { amountPaisa, fromAccountId, categoryId, note, date ->
-                viewModel.recordExpense(amountPaisa, fromAccountId, categoryId, note, date) { msg ->
+            onSaveExpense = { amountPaisa, fromAccountId, categoryId, note, date, receiptUri ->
+                viewModel.recordExpense(amountPaisa, fromAccountId, categoryId, note, date, receiptUri) { msg ->
                     scope.launch { snackbarHostState.showSnackbar(msg) }
                 }
             },
