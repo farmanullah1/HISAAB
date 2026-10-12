@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Hisaab",
+  "description": "Minimal, offline-first personal finance app. Quiet ledger tracking and personal wishlist / shopping planner.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
